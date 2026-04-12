@@ -35,9 +35,17 @@ cd benchbase
 # 5. Extract Build
 cd target
 tar -xvzf benchbase-postgres.tgz
+
+
 mv benchbase-postgres /home/vagrant/benchbase-run
 
 # 6. Add permission for user vagrant
 sudo chown -R vagrant:vagrant /home/vagrant/benchbase-run
+
+# Change URL and password in config
+CONFIG_FILE="/home/vagrant/benchbase-run/config/postgres/sample_tpcc_config.xml"
+
+sed -i "s|<url>jdbc:postgresql://localhost:5432/benchbase?sslmode=disable&amp;ApplicationName=tpcc&amp;reWriteBatchedInserts=true</url>|<url>jdbc:postgresql://192.168.240.10:5432/tpcc</url>|g" $CONFIG_FILE
+sed -i "s|<password>password</password>|<password>1234</password>|g" $CONFIG_FILE
 
 echo "Client Node Setup Completed! BenchBase is ready in /home/vagrant/benchbase-run"
