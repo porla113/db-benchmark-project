@@ -15,7 +15,7 @@ Vagrant.configure("2") do |config|
     # Hardware configuration
     pg.vm.provider "vmware_desktop" do |v|
       v.vmx["displayname"] = "Bench-PostgreSQL-Node" # Display in VMware
-      v.gui = false
+      v.gui = true
       v.cpus = 2
       v.memory = 16384 
 
@@ -41,7 +41,7 @@ Vagrant.configure("2") do |config|
     # Hardware configuration
     client.vm.provider "vmware_desktop" do |v|
       v.vmx["displayname"] = "Bench-Client-Node" # Display in VMware
-      v.gui = false
+      v.gui = true
       v.cpus = 2     
       v.memory = 8192
     end
