@@ -1,7 +1,10 @@
 Vagrant.configure("2") do |config|
 
-    # --- VM 1: PostgreSQL-node ---
-    config.vm.define "pg_node" do |pg|
+  # --- VM 1: PostgreSQL-node ---
+  config.vm.define "pg_node" do |pg|
+
+    # Host name
+    pg.vm.hostname = "pg-node" # Display at promt
     
     # Use Image Ubuntu 24.04
     pg.vm.box = "bento/ubuntu-24.04"
@@ -11,6 +14,7 @@ Vagrant.configure("2") do |config|
     
     # Hardware configuration
     pg.vm.provider "vmware_desktop" do |v|
+      v.vmx["displayname"] = "Bench-PostgreSQL-Node"
       v.gui = false
       v.cpus = 2
       v.memory = 16384 
@@ -18,23 +22,32 @@ Vagrant.configure("2") do |config|
     end
 
     # Run this script after VM creation
-    pg.vm.provision "shell", path: "./scripts/setup_pg.sh"
+    pg.vm.provision "shell", path: "./scripts/setup-pg.sh"
 
   end
 
   # --- VM 2: Client-node ---
   config.vm.define "client_node" do |client|
+
+    # Host name
+    pg.vm.hostname = "pg-node" # Display at promt
+
+    # Use Image Ubuntu 24.04
     client.vm.box = "bento/ubuntu-24.04"
+
+    # Network configure
     client.vm.network "private_network", ip: "192.168.240.20"
     
+    # Hardware configuration
     client.vm.provider "vmware_desktop" do |v|
+      v.vmx["displayname"] = "Bench-Client-Node" # Display in VMware
       v.gui = false
       v.cpus = 2     
       v.memory = 8192
     end
 
     # Run this script after VM creation
-    client.vm.provision "shell", path: "./scripts/setup_client.sh"
+    client.vm.provision "shell", path: "./scripts/setup-client.sh"
   end
 
 end
