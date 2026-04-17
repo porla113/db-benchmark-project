@@ -50,4 +50,30 @@ Vagrant.configure("2") do |config|
     client.vm.provision "shell", path: "./scripts/setup-client.sh"
   end
 
+  # --- VM 3-5: CockroachDB 3-Node Cluster ---
+  (1..3).each do |i|
+    config.vm.define "ckdb_node_#{i}" do |node|
+
+      # Host name
+      node.vm.hostname = "ckdb-node-#{i}" # Display at promt
+
+      # Use Image Ubuntu 24.04
+      node.vm.box = "bento/ubuntu-24.04"
+
+      # Network configure
+      node.vm.network "private_network", ip: "192.168.240.3#{i}"
+
+      # Hardware configuration
+      node.vm.provider "vmware_desktop" do |v|
+        v.vmx["displayname"] = "Bench-CockroachDB-Node-#{i}"
+        v.cpus = 2
+        v.memory = 8192 # 8GB total 24GB for Cluster
+      end
+
+      # Run this script after VM creation
+      node.vm.provision "shell", path: "./scripts/setup_ckdb.sh", env: {"NODE_ID" => i}
+    end
+
+  end
+
 end
