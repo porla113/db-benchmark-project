@@ -71,7 +71,7 @@ Vagrant.configure("2") do |config|
       end
 
       # Run this script after VM creation
-      node.vm.provision "shell", path: "./scripts/setup_ckdb.sh", env: {"NODE_ID" => i}
+      node.vm.provision "shell", path: "./scripts/setup-ckdb.sh", env: {"NODE_ID" => i}
     end
 
   end
