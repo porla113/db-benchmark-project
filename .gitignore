@@ -1,2 +1,9 @@
 # Ignore vagrant
 .vagrant
+
+# Ignore results
+!/results
+/results/*
+
+# Ignore .venv
+/analysis/.venv
