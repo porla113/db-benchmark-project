@@ -8,15 +8,33 @@ Setup an virtual environment for benchmarking PostgreSQL and CockroachDB with Be
 - PostgreSQL server (pg_node) will have PostgreSQL installed and configured.
 
 ## Tools
-Download links and setup please see [Links](#links) section.
+Install these tools and verify that they are working. Download links and setup please see [Links](#links) section.
 - VMware Workstation Pro 25H2 (version 25.0.0.24995812)
 - Vagrant (2.4.9)
   - vagrant-vmware-desktop (3.0.5, global)
   - vagrant-vmware-utility (1.0.21)
+- Python (3.14.4)
+  - This is optional, only if you want to do data plotting with Python
 
 ## Setup
 - Clone the repository.
-- Modify virtual machines specification in Vagrantfile.
+- Modify virtual machines specification in Vagrantfile, setup-pg.sh, and setup-client.sh and save before proceeding.
+- In project folder, run  
+`vagrant up`
+- Five VMs will be created.
+
+| VM | IP |
+| --- | --- |
+| client_node | 192.168.240.20 |
+| pg_node | 192.168.240.10 |
+| cr_node_1 | 192.168.240.31 |
+| cr_node_2 | 192.168.240.32 |
+| cr_node_3 | 192.168.240.33 |
+
+- To close all VMs run  
+`vagrant halt`
+
+## Tips
 - For resources efficiency run each environment separately.
   - Run PostgreSQL environment
     - Run  
@@ -27,18 +45,11 @@ Download links and setup please see [Links](#links) section.
   - Stop unused nodes ex.
     - To stop the pg_node run  
 `vagrant halt pg_node`
-
-## VM IPv4 Address
-| VM | IP |
-| --- | --- |
-| client_node | 192.168.240.20 |
-| pg_node | 192.168.240.10 |
-| cr_node_1 | 192.168.240.31 |
-| cr_node_2 | 192.168.240.32 |
-| cr_node_3 | 192.168.240.33 |
+- To visualize the result with Python
+  - Install
 
 ## Run Test
-- PostgreSQL
+- **PostgreSQL**
   - `vagrant up pg_node client_node`
   - SSH to client_node  
 `vagrant ssh client_node`
@@ -54,6 +65,13 @@ Download links and setup please see [Links](#links) section.
     - After loading is done, if you are going to stick with this data, my advise is to shutdown the PostgreSQL server (pg_node) and make a VM snapshot.
     - Execute the benchmaek workload. Note that the result location can be modify in the command, now set to "/vagrant/results/first_test".  
 `java -jar benchbase.jar -b tpcc -c config/postgres/sample_tpcc_config.xml --execute=true -d /vagrant/results/first_test`
+  - At Host
+    - The results will be saved in results folder.
+    - Plotting graph (optional)
+      - Make sure Python virtual environment and required packages are setup, please see [Python venv and packages](#python-venv-and-packages).
+      - Activate Python virtual environment  
+`.venv\Scripts\activate `
+      - 
 
 ## Links
 - Download **VMware**
@@ -67,3 +85,14 @@ Download links and setup please see [Links](#links) section.
   - https://releases.hashicorp.com/vagrant-vmware-utility/1.0.21/vagrant-vmware-utility_1.0.21_x86_64.msi
 - **Benchbase** github page
   - https://github.com/cmu-db/benchbase
+
+## Other Setups
+### Python venv and packages
+- Go to analysis folder  
+`cd .\analysis\`
+- Create Python virtual environment  
+`python -m venv .venv`
+- Activate venv  
+`.venv\Scripts\activate` 
+- Install packages  
+`pip install -r requirements.txt`
