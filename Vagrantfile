@@ -17,7 +17,7 @@ Vagrant.configure("2") do |config|
       v.vmx["displayname"] = "Bench-PostgreSQL-Node" # Display in VMware
       v.gui = true
       v.cpus = 2
-      v.memory = 16384 
+      v.memory = 16384 # 16 GB
 
     end
 
@@ -43,7 +43,7 @@ Vagrant.configure("2") do |config|
       v.vmx["displayname"] = "Bench-Client-Node" # Display in VMware
       v.gui = true
       v.cpus = 2     
-      v.memory = 8192
+      v.memory = 8192 # 8 GB
     end
 
     # Run this script after VM creation
