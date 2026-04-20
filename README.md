@@ -1,7 +1,7 @@
 # DB Benchmark Project
 
 ## Overview
-Setup an virtual environment for benchmarking PostgreSQL and CockroachDB with Benchbase (Multi-DBMS SQL Benchmarking Framework via JDBC).
+Setup an virtual environment (VMware) for benchmarking PostgreSQL and CockroachDB with Benchbase (Multi-DBMS SQL Benchmarking Framework via JDBC).
 
 - This will setup five VMs (client, PostgreSQL server, and three CockroachDB servers).
 - Benchbase and its dependencies are setup and built on the client (client node) ready to run a test.
@@ -18,18 +18,19 @@ Install these tools and verify that they are working. Download links and setup p
 
 ## Setup
 - Clone the repository.
-- Modify virtual machines specification in Vagrantfile, setup-pg.sh, and setup-client.sh and save before proceeding.
+- Feel free to modify virtual machines specification in Vagrantfile, setup-pg.sh, and setup-client.sh and save before proceeding.
+- Open VMware Workstation.
 - In project folder, run  
 `vagrant up`
 - Five VMs will be created.
 
-| VM | IP |
-| --- | --- |
-| client_node | 192.168.240.20 |
-| pg_node | 192.168.240.10 |
-| cr_node_1 | 192.168.240.31 |
-| cr_node_2 | 192.168.240.32 |
-| cr_node_3 | 192.168.240.33 |
+| VM | CPU | Memory | IP |
+| --- | --- | --- | --- |
+| pg_node | 2 | 16 GB | 192.168.240.10 |
+| client_node | 2 | 8 GB | 192.168.240.20 |
+| cr_node_1 | 2 | 8 GB | 192.168.240.31 |
+| cr_node_2 | 2 | 8 GB | 192.168.240.32 |
+| cr_node_3 | 2 | 8 GB | 192.168.240.33 |
 
 - To close all VMs run  
 `vagrant halt`
@@ -46,15 +47,18 @@ Install these tools and verify that they are working. Download links and setup p
     - To stop the pg_node run  
 `vagrant halt pg_node`
 - To visualize the result with Python
-  - Install
+  - (-- in progress --)
 
 ## Run Test
 - **PostgreSQL**
+  - Open VMware Workstation.
   - `vagrant up pg_node client_node`
+  - Normally postgreSQL server will start automatically to make sure SSH to pg_node and run  
+`sudo systemctl status postgresql`
   - SSH to client_node  
 `vagrant ssh client_node`
   - At the client_node
-    - `cd benchbase-run/`
+    - `cd benchbase-run-pg/`
     - Modify (if needed) the config file (config/postgres/sample_tpcc_config.xml) ex. scalefactor, terminals. Save.
     - Create/initialize the database  
     `java -jar benchbase.jar -b tpcc -c config/postgres/sample_tpcc_config.xml --create=true`
@@ -63,15 +67,34 @@ Install these tools and verify that they are working. Download links and setup p
     - Or create and load at the same time  
     `java -jar benchbase.jar -b tpcc -c config/postgres/sample_tpcc_config.xml --create=true --load=true`
     - After loading is done, if you are going to stick with this data, my advise is to shutdown the PostgreSQL server (pg_node) and make a VM snapshot.
-    - Execute the benchmaek workload. Note that the result location can be modify in the command, now set to "/vagrant/results/first_test".  
-`java -jar benchbase.jar -b tpcc -c config/postgres/sample_tpcc_config.xml --execute=true -d /vagrant/results/first_test`
+    - Execute the benchmaek workload. Note that the result location can be modify in the command, now set to "/vagrant/results/first_test_pg".  
+`java -jar benchbase.jar -b tpcc -c config/postgres/sample_tpcc_config.xml --execute=true -d /vagrant/results/first_test_pg`
   - At Host
-    - The results will be saved in results folder.
+    - The results will be saved in **results** folder.
     - Plotting graph (optional)
       - Make sure Python virtual environment and required packages are setup, please see [Python venv and packages](#python-venv-and-packages).
       - Activate Python virtual environment  
 `.venv\Scripts\activate `
-      - 
+      - (-- in progress --)
+- **CockroachDB**
+  - Open VMware Workstation.
+  - `vagrant up client_node ckdb_node_1 ckdb_node_2 ckdb_node_3`
+  - SSH to client_node  
+`vagrant ssh client_node`
+  - At the client_node
+    - `cd benchbase-run-ck/`
+    - Modify (if needed) the config file (config/cockroachdb/sample_tpcc_config.xml) ex. scalefactor, terminals. Save.
+    - Create/initialize the database  
+    `java -jar benchbase.jar -b tpcc -c config/cockroachdb/sample_tpcc_config.xml --create=true`
+    - Load data to PostgreSQL server.  
+    `java -jar benchbase.jar -b tpcc -c config/cockroachdb/sample_tpcc_config.xml --load=true`
+    - Or create and load at the same time  
+    `java -jar benchbase.jar -b tpcc -c config/cockroachdb/sample_tpcc_config.xml --create=true --load=true`
+    - After loading is done, if you are going to stick with this data, my advise is to shutdown the CockroachDB server (ck_node_1 - 3) and make a VM snapshot.
+    - Execute the benchmaek workload. Note that the result location can be modify in the command, now set to "/vagrant/results/first_test_ck".  
+`java -jar benchbase.jar -b tpcc -c config/cockroachdb/sample_tpcc_config.xml --execute=true -d /vagrant/results/first_test_ck`
+  - At Host
+    - The results will be saved in **results** folder.
 
 ## Links
 - Download **VMware**
