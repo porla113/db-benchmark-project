@@ -66,6 +66,7 @@ Vagrant.configure("2") do |config|
       # Hardware configuration
       node.vm.provider "vmware_desktop" do |v|
         v.vmx["displayname"] = "Bench-CockroachDB-Node-#{i}"
+        v.gui = true
         v.cpus = 2
         v.memory = 8192 # 8GB total 24GB for Cluster
       end
