@@ -18,7 +18,7 @@ Install these tools and verify that they are working. Download links and setup p
 
 ## Setup
 - Clone the repository.
-- Feel free to modify virtual machines specification in Vagrantfile, setup-pg.sh, and setup-client.sh and save before proceeding.
+- Feel free to modify virtual machines specification in Vagrantfile, setup-pg.sh, setup-ckdb.sh, and setup-client.sh and save before proceeding.
 - Open VMware Workstation.
 - In project folder, run  
 `vagrant up`
@@ -55,17 +55,15 @@ Install these tools and verify that they are working. Download links and setup p
   - `vagrant up pg_node client_node`
   - Normally postgreSQL server will start automatically to make sure SSH to pg_node and run  
 `sudo systemctl status postgresql`
+    - If it is not running. To start the server run   
+`sudo systemctl start postgresql`
   - SSH to client_node  
 `vagrant ssh client_node`
   - At the client_node
     - `cd benchbase-run-pg/`
-    - Modify (if needed) the config file (config/postgres/sample_tpcc_config.xml) ex. scalefactor, terminals. Save.
-    - Create/initialize the database  
-    `java -jar benchbase.jar -b tpcc -c config/postgres/sample_tpcc_config.xml --create=true`
-    - Load data to PostgreSQL server.  
-    `java -jar benchbase.jar -b tpcc -c config/postgres/sample_tpcc_config.xml --load=true`
-    - Or create and load at the same time  
-    `java -jar benchbase.jar -b tpcc -c config/postgres/sample_tpcc_config.xml --create=true --load=true`
+    - Modify the config file (config/postgres/sample_tpcc_config.xml) ex. scalefactor, terminals, time. Then save.
+    - Create/initialize the database and load data to PostgreSQL server.  
+`java -jar benchbase.jar -b tpcc -c config/postgres/sample_tpcc_config.xml --create=true --load=true`
     - After loading is done, if you are going to stick with this data, my advise is to shutdown the PostgreSQL server (pg_node) and make a VM snapshot.
     - Execute the benchmaek workload. Note that the result location can be modify in the command, now set to "/vagrant/results/first_test_pg".  
 `java -jar benchbase.jar -b tpcc -c config/postgres/sample_tpcc_config.xml --execute=true -d /vagrant/results/first_test_pg`
@@ -79,17 +77,18 @@ Install these tools and verify that they are working. Download links and setup p
 - **CockroachDB**
   - Open VMware Workstation.
   - `vagrant up client_node ckdb_node_1 ckdb_node_2 ckdb_node_3`
+  - Open the Admin UI to check each node status in any web browser `http://192.168.240.31:8080`
+  - In case there are dead nodes.
+    - SSH to the dead node. Start CockroachDB run  
+  `sudo systemctl start cockroach`
   - SSH to client_node  
 `vagrant ssh client_node`
   - At the client_node
     - `cd benchbase-run-ck/`
     - Modify (if needed) the config file (config/cockroachdb/sample_tpcc_config.xml) ex. scalefactor, terminals. Save.
-    - Create/initialize the database  
-    `java -jar benchbase.jar -b tpcc -c config/cockroachdb/sample_tpcc_config.xml --create=true`
-    - Load data to PostgreSQL server.  
-    `java -jar benchbase.jar -b tpcc -c config/cockroachdb/sample_tpcc_config.xml --load=true`
-    - Or create and load at the same time  
+    - Create/initialize the database Load data to CockroachDB cluster.  
     `java -jar benchbase.jar -b tpcc -c config/cockroachdb/sample_tpcc_config.xml --create=true --load=true`
+    - Wait time (scale factor of 2 can take about 30 minutes).
     - After loading is done, if you are going to stick with this data, my advise is to shutdown the CockroachDB server (ck_node_1 - 3) and make a VM snapshot.
     - Execute the benchmaek workload. Note that the result location can be modify in the command, now set to "/vagrant/results/first_test_ck".  
 `java -jar benchbase.jar -b tpcc -c config/cockroachdb/sample_tpcc_config.xml --execute=true -d /vagrant/results/first_test_ck`
