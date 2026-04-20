@@ -35,59 +35,92 @@ fi
 # 3. Create Data Directory
 if [ ! -d "/home/vagrant/ckdb_data" ]; then
     # 3. Create Data Directory
-    mkdir -p /home/vagrant/ckdb_data
+    sudo mkdir -p /home/vagrant/ckdb_data
+    sudo chown -R vagrant:vagrant /home/vagrant/ckdb_data
 fi
 
-# Start CockroachDB Node
-# Use NODE_ID from Vagrantfile to set its own IP
-MY_IP="192.168.240.3${NODE_ID}"
+# 4. Create and start CockroachDB service (start at boot)
 
-if ! pgrep -x "cockroach" > /dev/null; then
-  nohup cockroach start \
-    --insecure \
-    --store=/home/vagrant/ckdb_data \
-    --listen-addr=${MY_IP}:26257 \
-    --http-addr=${MY_IP}:8080 \
-    --join=192.168.240.31:26257,192.168.240.32:26257,192.168.240.33:26257 \
-    --cache=25% \
-    --max-sql-memory=25% \
-    --background
-else
-    echo "CockroachDB is already running."
+MY_IP="192.168.240.3${NODE_ID}"    # Use NODE_ID from Vagrantfile to set its own IP
+CK_SERV_FILE="/etc/systemd/system/cockroach.service"
+
+if [ ! -f "$CK_SERV_FILE" ]; then
+  # Create a service for systemd
+  sudo tee $CK_SERV_FILE <<EOF
+[Unit]
+Description=CockroachDB
+# Wait for network online
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=notify
+User=vagrant
+# Delay 10 seconds
+ExecStartPre=/bin/sleep 10
+ExecStart=/usr/local/bin/cockroach start --insecure --store=/home/vagrant/ckdb_data --listen-addr=${MY_IP}:26257 --http-addr=${MY_IP}:8080 --join=192.168.240.31:26257,192.168.240.32:26257,192.168.240.33:26257 --cache=25% --max-sql-memory=25%
+# Delay restart 10 seconds
+Restart=always
+RestartSec=10
+# Disable the limit
+StartLimitIntervalSec=0
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+  # Enable and start the service
+  sudo systemctl daemon-reload
+  sudo systemctl enable cockroach
+
+  if pgrep -x "cockroach" > /dev/null; then
+      sudo pkill -9 cockroach
+      sleep 2
+  fi
+  
+  sudo systemctl start cockroach
 fi
 
-# Only node 1 initializes cluster
-if [ "$NODE_ID" == "1" ]; then
-  # Check the cluster is already init or not
+# 5. Initialize cluster (only node_3 do trigger)
+
+if [ "$NODE_ID" == "3" ]; then
+
+  sleep 5
+
+  # Cluster is already initialized?
   if ! cockroach node status --insecure --host=192.168.240.31 > /dev/null 2>&1; then
-    echo "Node 1: Waiting for all nodes to start their engines..."
-    
-    # IP addresses in the cluster
-    NODES=("192.168.240.32" "192.168.240.33")
+
+    echo "Node 3: Checking neighbors (Node 1 & 2)..."
+
+    # Node 1 and 2
+    NODES=("192.168.240.31" "192.168.240.32")
     
     for NODE_IP in "${NODES[@]}"; do
       echo "Checking connection to $NODE_IP..."
 
       # Loop until successfully connect to port 26257
       while ! nc -z $NODE_IP 26257; do
-        echo "Still waiting for $NODE_IP to be ready..."
-        sleep 4
+        echo "Waiting for $NODE_IP ..."
+        sleep 5
       done
 
       echo "Connection to $NODE_IP established!"
-    done
 
-    # When all nodes are online
+    done
+      
+    # When all nodes are online, initialize cluser via node_1
     echo "All nodes are online. Initializing cluster..."
     cockroach init --insecure --host=192.168.240.31:26257
-    
+
     # Wait for Cluster ready to recieve SQL
-    sleep 5
+    sleep 10
     echo "Creating tpcc database..."
     cockroach sql --insecure --host=192.168.240.31:26257 --execute="CREATE DATABASE tpcc;"
-    
+
     echo "CockroachDB Cluster is fully operational!"
+    
   else
     echo "Cluster is already initialized."
   fi
 fi
+    
