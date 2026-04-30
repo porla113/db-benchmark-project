@@ -42,7 +42,7 @@ Install these tools and verify that they are working. Download links and setup p
 `vagrant up pg_node client_node`
   - Run CockroachDB environment
     - Run  
-`vagrant up cr_node_1 cr_node_2 cr_node_3 client_node`
+`vagrant up ckdb_node_1 ckdb_node_2 ckdb_node_3 client_node`
   - Stop unused nodes ex.
     - To stop the pg_node run  
 `vagrant halt pg_node`
