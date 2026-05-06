@@ -46,6 +46,11 @@ Install these tools and verify that they are working. Download links and setup p
   - Stop unused nodes ex.
     - To stop the pg_node run  
 `vagrant halt pg_node`
+- To delete VMs
+  - Halt all VMs first  
+  `vagrant halt`
+  - Destroy all resources (skip confirmation prompt for each machine)  
+`vagrant destroy -f`
 - To visualize the result with Python
   - (-- in progress --)
 
