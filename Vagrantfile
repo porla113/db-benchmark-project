@@ -16,8 +16,8 @@ Vagrant.configure("2") do |config|
     pg.vm.provider "vmware_desktop" do |v|
       v.vmx["displayname"] = "Bench-PostgreSQL-Node" # Display in VMware
       v.gui = true
-      v.cpus = 6
-      v.memory = 32768 # 32 GiB
+      v.cpus = 2     
+      v.memory = 16384 # 16 GiB
 
     end
 
