@@ -3,7 +3,7 @@
 # 1. Update and install packages
 
 # Package list Java 23, Maven, Git, and monitor tools
-PACKAGES=(maven git htop iotop sysstat postgresql-client)
+PACKAGES=(maven git htop iotop tmux sysstat postgresql-client)
 TO_INSTALL=()
 
 # Check installed packages
