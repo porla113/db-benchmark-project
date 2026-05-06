@@ -16,8 +16,8 @@ Vagrant.configure("2") do |config|
     pg.vm.provider "vmware_desktop" do |v|
       v.vmx["displayname"] = "Bench-PostgreSQL-Node" # Display in VMware
       v.gui = true
-      v.cpus = 2
-      v.memory = 16384 # 16 GB
+      v.cpus = 6
+      v.memory = 32768 # 32 GiB
 
     end
 
@@ -43,7 +43,7 @@ Vagrant.configure("2") do |config|
       v.vmx["displayname"] = "Bench-Client-Node" # Display in VMware
       v.gui = true
       v.cpus = 2     
-      v.memory = 8192 # 8 GB
+      v.memory = 8192 # 8 GiB
     end
 
     # Run this script after VM creation
@@ -68,7 +68,7 @@ Vagrant.configure("2") do |config|
         v.vmx["displayname"] = "Bench-CockroachDB-Node-#{i}"
         v.gui = true
         v.cpus = 2
-        v.memory = 8192 # 8GB total 24GB for Cluster
+        v.memory = 8192 # 8GiB total 24GiB for Cluster
       end
 
       # Run this script after VM creation
