@@ -93,7 +93,7 @@ Install these tools and verify that they are working. Download links and setup p
     - Modify (if needed) the config file (config/cockroachdb/sample_tpcc_config.xml) ex. scalefactor, terminals. Save.
     - Create/initialize the database Load data to CockroachDB cluster.  
     `java -jar benchbase.jar -b tpcc -c config/cockroachdb/sample_tpcc_config.xml --create=true --load=true`
-    - Wait time (scale factor of 2 can take about 30 minutes).
+    - Wait time (scale factor of 2 can take about 30 minutes and scale factor of 10 takes about 3 hours).
     - After loading is done, if you are going to stick with this data, my advise is to shutdown the CockroachDB server (ck_node_1 - 3) and make a VM snapshot.
     - Execute the benchmaek workload. Note that the result location can be modify in the command, now set to "/vagrant/results/first_test_ck".  
 `java -jar benchbase.jar -b tpcc -c config/cockroachdb/sample_tpcc_config.xml --execute=true -d /vagrant/results/first_test_ck`
